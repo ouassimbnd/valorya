@@ -22,7 +22,7 @@ export function createGoogleSaveUrl(identity: GoogleWalletIdentity): string {
   const privateKey = Buffer.from(process.env.GOOGLE_WALLET_PRIVATE_KEY_BASE64!, "base64").toString("utf8");
   const classId = `${issuer}.valorya-${identity.businessId}`;
   const objectId = `${issuer}.${identity.membershipId}`;
-  const background = identity.accentColor && HEX.test(identity.accentColor) ? identity.accentColor : "#109B81";
+  const background = identity.accentColor && HEX.test(identity.accentColor) ? identity.accentColor : "#0FA3A0";
 
   const payload = {
     iss: email,

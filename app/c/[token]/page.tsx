@@ -22,7 +22,7 @@ export default function PublicDigitalCard(){
   if(!configured)return <div className="pub-page"><div className="card empty"><h2>Carte indisponible</h2><p>Valorya n’est pas encore configuré.</p></div></div>;
   if(loading)return <div className="pub-page"><Skeleton height={420} radius={24}/></div>;
   if(error||!data||!computed)return <div className="pub-page"><div className="card empty" role="alert"><span className="empty-icon danger"><Icon name="alert" size={26}/></span><h3>Carte introuvable</h3><p>{error||"Ce lien n’est plus valide."}</p></div></div>;
-  const type=resolveType(data.business.category); const accent=safeColor(data.business.accent_color,"#109B81");
+  const type=resolveType(data.business.category); const accent=safeColor(data.business.accent_color,"#0FA3A0");
   const style={"--brand-accent":accent,"--brand-dark":shade(accent,-.45)} as CSSProperties;
   const ready=data.rewards.filter(r=>computed.points>=r.points_cost);
   return <div className="pub-page customer-page" style={style}>
