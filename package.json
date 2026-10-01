@@ -1,0 +1,35 @@
+{
+  "name": "valorya-pme",
+  "version": "13.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "test:wallet": "node tests/wallet.cjs",
+    "test:logic": "node tests/logic.cjs",
+    "test": "npm run test:logic && npm run test:wallet && npm run test:passcreator && npm run test:wallet-db",
+    "test:wallet-db": "node tests/wallet-db.cjs",
+    "test:passcreator": "node tests/passcreator.cjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.117.2",
+    "jose": "6.2.12",
+    "next": "15.5.26",
+    "passkit-generator": "3.6.1",
+    "qrcode.react": "4.2.0",
+    "react": "19.1.2",
+    "react-dom": "19.1.2"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.8",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/node": "20.19.43",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "postcss": "8.5.28",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}
