@@ -23,7 +23,7 @@ function JoinContent(){
  if(loading)return <div className="pub-page"><Skeleton height={200} radius={22}/><div style={{height:14}}/><Skeleton height={360} radius={18}/></div>;
  if(!configured)return <div className="pub-page"><div className="card empty"><h3>Inscription indisponible</h3><p>Ce service n’est pas encore configuré.</p></div></div>;
  if(notFound||!business)return <div className="pub-page"><div className="card empty" role="alert"><span className="empty-icon danger"><Icon name="alert" size={26}/></span><h3>Commerce introuvable</h3><p>{error||"Ce lien n’est plus valide."}</p></div></div>;
- const type=resolveType(business.category);const accent=safeColor(business.accent_color,"#0FA3A0");const style={"--brand-accent":accent,"--brand-dark":shade(accent,-.45)} as CSSProperties; const first=rewards[0];
+ const type=resolveType(business.category);const accent=safeColor(business.accent_color,"#109B81");const style={"--brand-accent":accent,"--brand-dark":shade(accent,-.45)} as CSSProperties; const first=rewards[0];
  return <div className="pub-page join-page" style={style}>
   <section className="join-hero"><span className="join-emoji">{business.logo_emoji||type.emoji}</span><span className="join-type">{type.label}</span><h1>{business.name}</h1>{business.description&&<p>{business.description}</p>}</section>
   <section className="card join-perks"><span className="kicker">PROGRAMME DE FIDÉLITÉ</span><p className="perk-line"><Icon name="star" size={18}/><span>{type.pitch}</span></p>{rewards.length>0&&<ul className="perk-rewards">{rewards.map(r=><li key={r.id}><Icon name="gift" size={16}/><span>{r.name}</span><b>{r.points_cost} pts</b></li>)}</ul>}</section>

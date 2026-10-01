@@ -127,7 +127,7 @@ function Content() {
 
   const b = selected.program.business;
   const type = resolveType(b.category);
-  const accent = safeColor(b.accent_color, "#0FA3A0");
+  const accent = safeColor(b.accent_color, "#109B81");
   const points = computePoints(summary.visits, summary.feedback, summary.spent);
   const goal = nextReward(rewards, points);
   const ready = rewards.filter(r => points >= r.points_cost);

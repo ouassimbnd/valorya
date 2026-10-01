@@ -57,14 +57,14 @@ export function safeColor(value: string | null | undefined, fallback: string): s
 
 /** Assombrit (amount < 0) ou éclaircit (amount > 0) une couleur hexadécimale, amount entre -1 et 1. */
 export function shade(hex: string, amount: number): string {
-  const color = safeColor(hex, "#0FA3A0").slice(1);
+  const color = safeColor(hex, "#109B81").slice(1);
   const channels = [0, 2, 4].map(i => parseInt(color.slice(i, i + 2), 16));
   const mixed = channels.map(c => Math.round(amount < 0 ? c * (1 + amount) : c + (255 - c) * amount));
   return "#" + mixed.map(c => Math.max(0, Math.min(255, c)).toString(16).padStart(2, "0")).join("");
 }
 
 export function withAlpha(hex: string, alpha: number): string {
-  const color = safeColor(hex, "#0FA3A0").slice(1);
+  const color = safeColor(hex, "#109B81").slice(1);
   const [r, g, b] = [0, 2, 4].map(i => parseInt(color.slice(i, i + 2), 16));
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }

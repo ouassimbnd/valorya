@@ -9,7 +9,7 @@ import { BUSINESS_TYPES, resolveType, type BusinessType } from "@/lib/business-t
 import { safeColor, shade } from "@/lib/loyalty";
 import { BUSINESS_UPDATED } from "../app-shell";
 
-const SWATCHES = ["#0FA3A0", "#102D46", "#FF8A3D", "#2563EB", "#7C5CFF", "#D6336C", "#0D9488", "#B7791F"];
+const SWATCHES = ["#109B81", "#102D46", "#FF8A3D", "#2563EB", "#7C5CFF", "#D6336C", "#0D9488", "#B7791F"];
 type Form = { name: string; category: string; address: string; phone: string; hours: string; description: string; logo_emoji: string; accent_color: string };
 const PHONE = /^[0-9+().\s-]{6,30}$/;
 
@@ -18,7 +18,7 @@ function Body({ merchant }: { merchant: MerchantState }) {
   const { toast } = useFeedback();
   const initial = useMemo<Form | null>(() => business ? {
     name: business.name || "", category: resolveType(business.category).label, address: business.address || "", phone: business.phone || "",
-    hours: business.hours || "", description: business.description || "", logo_emoji: business.logo_emoji || "", accent_color: safeColor(business.accent_color, "#0FA3A0"),
+    hours: business.hours || "", description: business.description || "", logo_emoji: business.logo_emoji || "", accent_color: safeColor(business.accent_color, "#109B81"),
   } : null, [business]);
   const [form, setForm] = useState<Form | null>(initial);
   const [busy, setBusy] = useState(false);

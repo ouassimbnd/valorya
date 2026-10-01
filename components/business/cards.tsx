@@ -52,7 +52,7 @@ function Body({ merchant }: { merchant: MerchantState }) {
   useEffect(() => { setOrigin(location.origin); void loadCards(); }, [loadCards]);
 
   if (!business) return null;
-  const accent = safeColor(business.accent_color, "#0FA3A0");
+  const accent = safeColor(business.accent_color, "#109B81");
   const joinUrl = `${origin}/join/${business.slug}`;
   const firstReward = [...rewards.filter(r => r.active)].sort((a, b) => a.points_cost - b.points_cost)[0];
   const markPoster = () => localStorage.setItem(`fideli.poster.${business.id}`, "1");

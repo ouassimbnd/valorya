@@ -44,7 +44,7 @@ function MerchantShell({ path, children }: { path: string; children: ReactNode }
         const { data } = await client.from("businesses").select("name,category,logo_emoji,accent_color").eq("owner_id", user.id).maybeSingle();
         if (data && !cancelled) {
           const type = resolveType(data.category);
-          setIdentity({ name: data.name, emoji: data.logo_emoji || type.emoji, color: safeColor(data.accent_color, "#0FA3A0") });
+          setIdentity({ name: data.name, emoji: data.logo_emoji || type.emoji, color: safeColor(data.accent_color, "#109B81") });
         }
       } catch { /* l’identité du commerce est décorative : on ignore l’échec */ }
     };
@@ -67,7 +67,7 @@ function MerchantShell({ path, children }: { path: string; children: ReactNode }
       <aside className={`app-sidebar ${open ? "is-open" : ""}`} aria-label="Navigation de l’espace commerçant">
         <Link className="brand" href="/business"><BrandLogo size={30} /><span>Valorya</span></Link>
         <div className="sidebar-business">
-          <span className="sidebar-avatar" style={{ background: identity?.color || "#0FA3A0" }} aria-hidden="true">{identity?.emoji || "•"}</span>
+          <span className="sidebar-avatar" style={{ background: identity?.color || "#109B81" }} aria-hidden="true">{identity?.emoji || "•"}</span>
           <div><strong>{identity?.name || "Mon commerce"}</strong><small>Espace commerçant</small></div>
         </div>
         <nav>
