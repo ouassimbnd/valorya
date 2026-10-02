@@ -1,6 +1,5 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { billingRequest } from "./billing-client";
 import { configured, supabase, errorMessage } from "./supabase";
 import { resolveType, type BusinessType } from "./business-types";
 
@@ -50,8 +49,6 @@ export function useMerchant(): MerchantState {
         location.replace(`/business/login?next=${encodeURIComponent(location.pathname + location.search)}`);
         return;
       }
-      const billing = await billingRequest("status");
-      if (!billing.access) { location.replace("/business/abonnement"); return; }
       const { data: b, error: be } = await client.from("businesses").select(COLUMNS).eq("owner_id", user.id).maybeSingle();
       if (be) throw be;
       if (!b) { location.replace("/business/new"); return; }

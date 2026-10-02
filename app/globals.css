@@ -100,5 +100,3 @@ h1,h2,h3,.brand,.stat strong{font-family:"Sora","Inter",sans-serif}
 .valorya-hero .text-\[\#109B81\],.valorya-cta .text-\[\#109B81\],#materiel .text-\[\#109B81\]{color:#109B81}
 .landing-page a:focus-visible,.landing-page button:focus-visible{outline:3px solid #109B81;outline-offset:4px}
 @media(max-width:420px){.valorya-wordmark{font-size:23px;gap:6px}.valorya-wordmark .brand-logo{width:30px;height:30px}}
-
-.billing-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}@media(max-width:640px){.billing-grid{grid-template-columns:1fr}}

@@ -2,7 +2,6 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { BillingGate } from "./billing-gate";
 import { Header, Footer, BrandLogo } from "./ui";
 import { Icon } from "./icons";
 import { FeedbackProvider } from "./feedback";
@@ -14,7 +13,7 @@ const NAV: { label: string; items: [string, string, string][] }[] = [
   { label: "Pilotage", items: [["/business", "Vue d’ensemble", "overview"], ["/business/caisse", "Caisse", "cash"]] },
   { label: "Clientèle", items: [["/business/clients", "Clients", "users"], ["/business/programme", "Récompenses", "gift"]] },
   { label: "Diffusion", items: [["/business/cartes", "QR & cartes", "qr"], ["/business/wallet", "Wallet mobile", "wallet"]] },
-  { label: "Gestion", items: [["/business/equipe", "Équipe", "team"], ["/business/profil", "Mon établissement", "store"], ["/business/abonnement", "Abonnement", "wallet"]] },
+  { label: "Gestion", items: [["/business/equipe", "Équipe", "team"], ["/business/profil", "Mon établissement", "store"]] },
 ];
 const ALL = NAV.flatMap(group => group.items);
 const AUTH_PATHS = ["/business/login", "/business/new", "/business/forgot-password", "/business/reset-password"];
@@ -117,8 +116,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const clientPublic = CLIENT_PUBLIC.some(p => path === p || path.startsWith(p + "/"));
 
   let content: ReactNode;
-  if (merchant) content = <MerchantShell path={path}>{path === "/business/abonnement" ? children : <BillingGate>{children}</BillingGate>}</MerchantShell>;
-  else if (path === "/business/new") content = <><Header /><BillingGate>{children}</BillingGate><Footer /></>;
+  if (merchant) content = <MerchantShell path={path}>{children}</MerchantShell>;
   else if (customer) {
     content = (
       <div className="client-shell">

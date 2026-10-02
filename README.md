@@ -1,8 +1,6 @@
 # Valorya PME — identité Confiance & croissance
 
 Interface produit repensée : espaces adaptés à chaque métier, parcours client complet, caisse rapide, Apple Wallet et Google Wallet.
-**Wallet personnalisé : commencez par [DEMARRER-WALLET-PERSONNALISE.md](DEMARRER-WALLET-PERSONNALISE.md).**
-
 **Mise à jour de marque : [CHANGEMENTS-VALORYA.md](CHANGEMENTS-VALORYA.md).**
 
 **Commencez par [MISE-EN-SERVICE.md](MISE-EN-SERVICE.md).** Ce guide décrit les changements, les validations et les étapes encore nécessaires avant lancement.
@@ -17,7 +15,7 @@ Les instructions ci-dessous décrivent la base existante et ses limites. Aucun a
 
 La page d'accueil `/` utilise Next.js et Tailwind CSS 4. Elle comprend un hero bleu nuit avec accents émeraude, une comparaison avant/après, un calculateur interactif, les fonctionnalités réellement présentes dans ce MVP, trois étapes, des chiffres d'exemple, un prix indicatif avec bascule mensuel/annuel et un appel à l'action. Le parcours Supabase des autres pages n'a pas été remplacé.
 
-Modifiez toutes les valeurs commerciales et les hypothèses dans **`lib/landing-config.ts`** : prix, chiffres du calculateur, points d'exemple et maquettes. Le calculateur représente une simulation de chiffre d'affaires, pas une prédiction ou un bénéfice. Les prix ne déclenchent aucun paiement. La synchronisation Passcreator est disponible après les réglages décrits dans le nouveau guide Wallet.
+Modifiez toutes les valeurs commerciales et les hypothèses dans **`lib/landing-config.ts`** : prix, chiffres du calculateur, points d'exemple et maquettes. Le calculateur représente une simulation de chiffre d'affaires, pas une prédiction ou un bénéfice. Les prix ne déclenchent aucun paiement. La section Wallet précise que l'intégration synchronisée n'est pas encore disponible.
 
 Pour afficher les polices Anton et Inter, la page charge Google Fonts ; si le réseau du visiteur les bloque, les polices de secours prévues par le CSS sont utilisées. Les animations respectent la préférence système de réduction du mouvement.
 
@@ -35,7 +33,7 @@ Cette version sépare les comptes commerçants et clients. Le commerçant crée 
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL du projet Supabase |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Clé publique (publishable) Supabase |
-| `SUPABASE_SERVICE_ROLE_KEY` | Clé service role, **secrète et seulement côté serveur**, utilisée pour la synchronisation Wallet et la suppression complète d'un compte |
+| `SUPABASE_SERVICE_ROLE_KEY` | Clé service role, **secrète et seulement côté serveur**, utilisée uniquement pour la suppression complète d'un compte |
 
 6. Redéployer après toute modification de variable. Ne jamais mettre la clé service role dans une variable `NEXT_PUBLIC_`, un commit ou une capture d'écran.
 7. Ouvrir `/business/login`, créer un compte, confirmer l'email, puis créer un commerce. Partager le lien `/join/son-slug` du tableau de bord.
@@ -58,7 +56,7 @@ Le tableau de bord crée un token UUID aléatoire lié à l'ID unique de l'étab
 
 ## Limites connues
 
-Le tableau de bord charge 25 clients par page avec des totaux calculés côté base. Les 20 dernières cartes physiques sont affichées ; prévoir un inventaire paginé pour une production à grand volume. Il n'y a pas de paiement, de campagnes marketing, de témoignages inventés ni de campagnes de notifications promotionnelles. La synchronisation des cartes Passcreator nécessite la configuration du guide Wallet. La page de confidentialité est un modèle à compléter avec les informations réelles et la durée de conservation avant un lancement public. Cette livraison ne contient pas les identifiants de votre projet Supabase et le SQL n'a pas été exécuté sur votre base.
+Le tableau de bord charge 25 clients par page avec des totaux calculés côté base. Les 20 dernières cartes physiques sont affichées ; prévoir un inventaire paginé pour une production à grand volume. Il n'y a pas de paiement, de campagnes marketing, de témoignages inventés ni de Wallet synchronisé. La page de confidentialité est un modèle à compléter avec les informations réelles et la durée de conservation avant un lancement public. Cette livraison ne contient pas les identifiants de votre projet Supabase et le SQL n'a pas été exécuté sur votre base.
 
 ## Évolutions V7
 
@@ -70,7 +68,7 @@ Le tableau de bord charge 25 clients par page avec des totaux calculés côté b
 ## Prochaines étapes recommandées
 
 1. Paiement des abonnements (Stripe) et essai réel de 30 jours.
-2. Wallet synchronisé : activer le modèle Passcreator, ses plateformes Wallet et les tâches Supabase selon DEMARRER-WALLET-PERSONNALISE.md.
+2. Wallet synchronisé : compte Apple Developer payant + certificats pass, API Google Wallet, émission et mise à jour côté serveur.
 3. Comptes employés avec code PIN, scan code-barres (Code 128) en plus du QR.
 4. Notifications de rappel, parrainage, paliers Bronze/Argent/Or.
 5. Compléter `/privacy` (responsable, contact, durées de conservation).
