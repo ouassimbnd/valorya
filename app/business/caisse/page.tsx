@@ -1,4 +1,5 @@
 "use client";
+import { syncWallet } from "@/lib/wallet-client";
 import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -171,6 +172,7 @@ function Register({ merchant }: { merchant: MerchantState }) {
       });
       addLog(fresh, "visit", `${type.visit.done} · +${POINTS_PER_VISIT} pts${counterName ? " · " + counterName : ""}`);
       navigator.vibrate?.(30);
+      void syncWallet(member.id).then(wallet => { if (wallet === "pending") toast("Mise à jour Wallet en attente pour " + fresh.name + ".", "info"); });
     } catch (e) { toast(errorMessage(e), "error"); } finally { lock.current = false; setBusy(false); }
   };
 
@@ -186,6 +188,7 @@ function Register({ merchant }: { merchant: MerchantState }) {
       const fresh = await refresh(member);
       setFlash({ title: "Récompense remise", body: `${reward.name} · ${fresh.name} a maintenant ${fresh.points} points.` });
       addLog(fresh, "reward", `Récompense : ${reward.name} (−${reward.points_cost} pts)`);
+      void syncWallet(member.id).then(wallet => { if (wallet === "pending") toast("Mise à jour Wallet en attente pour " + fresh.name + ".", "info"); });
     } catch (e) { toast(errorMessage(e), "error"); } finally { lock.current = false; setBusy(false); }
   };
 

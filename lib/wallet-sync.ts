@@ -47,15 +47,7 @@ export async function readWallet(admin: SupabaseClient, membershipId: string): P
   if (r.error) throw databaseError();
   return r.data;
 }
-export async function assertWalletPlan(admin: SupabaseClient, membershipId: string) {
-  const r = await admin.rpc("billing_wallet_access", { p_membership: membershipId });
-  if (r.error) throw new WalletError(503, "Vérifiez l’installation des abonnements.");
-  if (!r.data) throw new WalletError(403, "L’ajout au Wallet nécessite un forfait Wallet actif pour ce commerce.");
-}
 export async function requestWallet(admin: SupabaseClient, membershipId: string) {
-  await assertWalletPlan(admin, membershipId);
-  const reservation = await admin.rpc("billing_reserve_wallet", { p_membership: membershipId });
-  if (reservation.error) throw new WalletError(409, "La carte Wallet ne peut pas être réservée. Vérifiez le forfait et la limite de 200 cartes auprès du commerce.");
   const r = await admin.rpc("wallet_request_pass", { p_membership: membershipId });
   if (r.error) throw databaseError();
 }
@@ -75,7 +67,6 @@ export async function processWalletJob(admin: SupabaseClient, membershipId?: str
       await deletePass(job.provider_id || job.membership_id);
       deleted = !data || job.operation === "delete";
     } else {
-      await assertWalletPlan(admin, job.membership_id);
       const known = job.provider_id && job.download_page && job.template_id ? {
         identifier: job.provider_id, templateId: job.template_id, downloadPage: job.download_page,
         appleUrl: job.apple_url || "", googleUrl: job.google_url || "",
