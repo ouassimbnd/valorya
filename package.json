@@ -9,9 +9,10 @@
     "typecheck": "tsc --noEmit",
     "test:wallet": "node tests/wallet.cjs",
     "test:logic": "node tests/logic.cjs",
-    "test": "npm run test:logic && npm run test:wallet && npm run test:passcreator && npm run test:wallet-db",
+    "test": "npm run test:logic && npm run test:wallet && npm run test:passcreator && npm run test:wallet-db && npm run test:billing",
     "test:wallet-db": "node tests/wallet-db.cjs",
-    "test:passcreator": "node tests/passcreator.cjs"
+    "test:passcreator": "node tests/passcreator.cjs",
+    "test:billing": "node tests/billing.cjs && node tests/billing-db.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "2.117.2",

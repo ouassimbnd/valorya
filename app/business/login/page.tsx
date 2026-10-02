@@ -21,10 +21,10 @@ export default function BusinessLogin() {
     try {
       const client = supabase();
       if (mode === "signup") {
-        const { data, error: se } = await client.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: `${location.origin}/auth/callback?next=/business/new` } });
+        const { data, error: se } = await client.auth.signUp({ email: email.trim(), password, options: { emailRedirectTo: `${location.origin}/auth/callback?next=/business/abonnement` } });
         if (se) throw se;
-        if (data.session) location.assign("/business/new");
-        else setMessage("Compte créé ! Ouvrez l’email de confirmation reçu : vous serez redirigé vers la création de votre programme.");
+        if (data.session) location.assign("/business/abonnement");
+        else setMessage("Compte créé ! Ouvrez l’email de confirmation reçu : vous serez redirigé vers le choix de votre forfait.");
       } else {
         const { error: le } = await client.auth.signInWithPassword({ email: email.trim(), password });
         if (le) throw le;
@@ -43,9 +43,9 @@ export default function BusinessLogin() {
           <li><b>✓</b>Pour tous les commerces : coiffeurs, restaurants, parfumeries, boutiques, instituts…</li>
           <li><b>✓</b>Aucune application à installer : un QR code suffit à vos clients</li>
           <li><b>✓</b>Caisse simple, équipe suivie, carte ajoutable au Wallet du téléphone</li>
-          <li><b>✓</b>30 jours d’essai gratuit, sans carte bancaire</li>
+          <li><b>✓</b>15 jours gratuits, puis abonnement — carte bancaire requise</li>
         </ul>
-        <div className="auth-plans">À partir de <b>9 € HT / mois</b> · Essentiel, Pro et Multi-boutiques</div>
+        <div className="auth-plans">À partir de <b>19 € HT / mois</b> · Essentiel et Wallet</div>
       </aside>
       <div className="auth-main">
         <div className="auth-card">

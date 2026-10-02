@@ -1,0 +1,51 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript'),crypto=require('node:crypto');
+const root=path.resolve(__dirname,'..');
+const modules={};let fetcher=async()=>{throw Error('Unexpected fetch')};
+function load(file){if(modules[file])return modules[file];const exports={};modules[file]=exports;
+ const js=ts.transpileModule(fs.readFileSync(path.join(root,file),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+ const req=n=>n.startsWith('./')?load(path.posix.join(path.posix.dirname(file),n)+'.ts'):n.startsWith('@/')?load(n.slice(2)+'.ts'):require(n);
+ vm.runInNewContext(js,{exports,require:req,process,Buffer,URL,URLSearchParams,Response,Headers,AbortSignal,fetch:(...args)=>fetcher(...args)},{filename:file});return exports;}
+Object.assign(process.env,{STRIPE_AUTOMATIC_TAX:'false',STRIPE_SECRET_KEY:'sk_test_fake',STRIPE_WEBHOOK_SECRET:'whsec_test',STRIPE_PRICE_ESSENTIEL_MONTH:'price_em',STRIPE_PRICE_ESSENTIEL_YEAR:'price_ey',STRIPE_PRICE_WALLET_MONTH:'price_wm',STRIPE_PRICE_WALLET_YEAR:'price_wy',APP_URL:'https://valorya.example'});
+const api=load('lib/stripe-server.ts'),billing=load('lib/billing-server.ts');
+const start=1800000000,day=86400,now=(start+day)*1000;
+const fresh=()=>({owner_id:'owner',stripe_customer:null,subscription_id:null,status:'none',trial_used_at:null,trial_ends_at:null,valid_until:null,checkout_id:null,checkout_nonce:'stable-key',checkout_plan:null,checkout_cycle:null,lock_token:'lease'});
+const subscription=()=>({id:'sub_test',created:start,customer:'cus_test',status:'trialing',trial_start:start,trial_end:start+15*day,cancel_at:null,cancel_at_period_end:false,pause_collection:null,items:{data:[{quantity:1,current_period_end:start+15*day,price:{id:'price_wm'}}]},latest_invoice:{status:'paid',paid:true,lines:{data:[{period:{end:start+15*day}}]}}});
+const raw=JSON.stringify({id:'evt_test',type:'invoice.paid',livemode:false,data:{object:{customer:'cus_test'}}});
+const timestamp=Math.floor(Date.now()/1000);const sign=t=>`t=${t},v1=${crypto.createHmac('sha256','whsec_test').update(t+'.'+raw).digest('hex')}`;
+assert.equal(api.verifyStripeEvent(raw,sign(timestamp)).id,'evt_test');
+assert.throws(()=>api.verifyStripeEvent(raw+' ',sign(timestamp)),/Signature/);
+assert.throws(()=>api.verifyStripeEvent(raw,sign(timestamp-301)),/Signature/);
+assert.throws(()=>api.verifyStripeEvent(raw,sign(timestamp+301)),/Signature/);
+assert.throws(()=>api.verifyStripeEvent(raw,sign(timestamp)+',t='+timestamp),/Signature/);
+let row=fresh(),sub=subscription();let patch=billing.subscriptionState(sub,row,now);
+assert.equal(patch.plan,'wallet');assert.equal(patch.valid_until,new Date((start+15*day)*1000).toISOString());
+assert.equal(billing.hasAccess(patch,(start+15*day)*1000-1),true);assert.equal(billing.hasAccess(patch,(start+15*day)*1000),false);
+row={...row,...patch};sub.trial_end=start+50*day;assert.equal(billing.subscriptionState(sub,row,now).valid_until,patch.valid_until,'trial extension must not reset original 15 days');
+for(const status of ['past_due','unpaid','canceled','paused','incomplete','incomplete_expired']){sub.status=status;assert.equal(billing.subscriptionState(sub,row,now).valid_until,null,status);}
+sub=subscription();sub.status='active';sub.items.data[0].current_period_end=start+45*day;
+patch=billing.subscriptionState(sub,row,(start+16*day)*1000);assert.equal(billing.hasAccess(patch,(start+16*day)*1000),false,'old trial invoice cannot unlock a new paid month');
+sub.latest_invoice.lines.data[0].period.end=start+45*day;patch=billing.subscriptionState(sub,row,now);assert.equal(patch.valid_until,new Date((start+45*day)*1000).toISOString());
+sub.latest_invoice.status='open';assert.equal(billing.subscriptionState(sub,row,now).valid_until,null);
+sub=subscription();sub.items.data[0].price.id='price_unknown';assert.equal(billing.subscriptionState(sub,row,now).valid_until,null);
+sub=subscription();sub.pause_collection={behavior:'void'};assert.equal(billing.subscriptionState(sub,row,now).valid_until,null);
+const admin={from(){return {update(){return this},eq(){return this},select(){return this},maybeSingle:async()=>({data:{owner_id:'owner'},error:null})}}};
+const calls=[];let responses=[];
+fetcher=async(url,init)=>{calls.push({url,init,body:Object.fromEntries(new URLSearchParams(init.body||''))});assert.equal(init.headers['Stripe-Version'],'2025-03-31.basil');const body=responses.shift();assert.ok(body,'unexpected request');return new Response(JSON.stringify(body),{status:200})};
+const price={active:true,currency:'eur',unit_amount:2900,tax_behavior:'exclusive',recurring:{interval:'month',interval_count:1}};
+(async()=>{
+ row=fresh();responses=[{id:'cus_test'},price,{id:'cs_test',url:'https://checkout.stripe.com/test'}];
+ assert.equal(await billing.startCheckout(admin,row,'wallet','month','merchant@example.test'),'https://checkout.stripe.com/test');
+ const checkout=calls.at(-1);assert.equal(checkout.body['subscription_data[trial_period_days]'],'15');assert.equal(checkout.body.payment_method_collection,'always');assert.equal(checkout.body['line_items[0][price]'],'price_wm');assert.equal(checkout.body['consent_collection[terms_of_service]'],'required');assert.equal(checkout.init.headers['Idempotency-Key'],'valorya-checkout-stable-key');
+ assert.equal(row.checkout_id,'cs_test');assert.equal(row.stripe_customer,'cus_test');
+ responses=[{data:[],has_more:false},{status:'open',url:'https://checkout.stripe.com/same'}];const before=calls.length;
+ assert.equal(await billing.startCheckout(admin,row,'wallet','month','merchant@example.test'),'https://checkout.stripe.com/same');assert.equal(calls.length-before,2,'reuse Checkout; no second subscription session');
+ row=fresh();row.trial_used_at=new Date(now).toISOString();responses=[{id:'cus_test'},price,{id:'cs_again',url:'https://checkout.stripe.com/again'}];await billing.startCheckout(admin,row,'wallet','month','a@example.test');assert.equal(calls.at(-1).body['subscription_data[trial_period_days]'],undefined,'returning customer gets no second trial');
+ row=fresh();responses=[{id:'cus_test'},{...price,unit_amount:900}];await assert.rejects(billing.startCheckout(admin,row,'wallet','month','a@example.test'),/prix Stripe/);
+ row={...fresh(),stripe_customer:'cus_test'};responses=[{data:[subscription()],has_more:false}];await assert.rejects(billing.startCheckout(admin,row,'wallet','month','a@example.test'),/abonnement existe/);
+ // Duplicate deliveries and reversed old events both reconcile the current provider state.
+ row={...fresh(),stripe_customer:'cus_test'};const live=subscription();live.status='canceled';responses=[{data:[live],has_more:false},{data:[live],has_more:false}];await billing.reconcile(admin,row);await billing.reconcile(admin,row);assert.equal(row.status,'canceled');assert.equal(row.valid_until,null);
+ responses=[{data:[subscription(),{...subscription(),id:'duplicate'}],has_more:false}];await assert.rejects(billing.reconcile(admin,row),/Plusieurs abonnements/);assert.equal(row.valid_until,null);
+ const authRoute=load('app/api/billing/checkout/route.ts');assert.equal((await authRoute.POST(new Request('https://valorya.example/api/billing/checkout',{method:'POST',body:'{}'}))).status,401);
+ const hook=load('app/api/billing/webhook/route.ts');assert.equal((await hook.POST(new Request('https://valorya.example/api/billing/webhook',{method:'POST',body:raw}))).status,400);
+ assert.equal(responses.length,0);console.log('PASS: webhook signatures/replay window, exact 15-day expiry, no reset, failed/unpaid/canceled states, invoice coverage, paused/unknown plans, price validation, Checkout reuse and idempotency, repeated reconciliation, unauthenticated endpoints');
+})().catch(e=>{console.error(e);process.exit(1)});

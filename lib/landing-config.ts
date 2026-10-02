@@ -1,3 +1,4 @@
+import { BILLING_PLANS } from "./billing-plans";
 /** Contenu commercial Valorya. Les prix et hypothèses restent centralisés ici. */
 export const landingConfig = {
   brand: "Valorya",
@@ -10,15 +11,9 @@ export const landingConfig = {
     hypotheticalGrowth: { initial: 5, min: 0, max: 20, step: 1 },
   },
   pricing: {
-    trialDays: 30,
-    annualDiscountLabel: "2 mois offerts",
-    taxLabel: "HT",
-    availability: "Tarifs de lancement configurables avant commercialisation. Aucun paiement n’est intégré à cette démo.",
-    plans: [
-      { id: "essentiel", name: "Essentiel", monthly: 9, annualPerMonth: 7, highlight: false, tagline: "Pour lancer son premier programme", features: ["1 établissement", "QR code d’adhésion", "Points et récompenses", "Tableau de bord essentiel"] },
-      { id: "pro", name: "Pro", monthly: 19, annualPerMonth: 15, highlight: true, tagline: "Pour piloter la fidélité au quotidien", features: ["Tout Essentiel", "Segmentation clients", "Parrainage", "Statistiques détaillées", "Accès équipe"] },
-      { id: "multi", name: "Multi-sites", monthly: 39, annualPerMonth: 31, highlight: false, tagline: "Pour les PME avec plusieurs établissements", features: ["Tout Pro", "Jusqu’à 5 établissements", "Équipe étendue", "Vue consolidée", "Support prioritaire"] },
-    ],
+    trialDays: 15, annualDiscountLabel: "2 mois offerts", taxLabel: "HT",
+    availability: "Carte bancaire requise. Renouvellement automatique après l’essai, sauf résiliation.",
+    plans: BILLING_PLANS,
   },
   trust: [
     { icon: "🔒", title: "Accès cloisonnés", description: "Chaque professionnel retrouve son établissement et ses données dans son propre espace." },
@@ -41,7 +36,7 @@ export const landingFeatures = [
   { icon: "+", title: "Points et récompenses", description: "Choisissez votre mécanique et définissez les avantages qui correspondent réellement à votre activité." },
   { icon: "▦", title: "Pilotage professionnel", description: "Suivez les adhésions, passages, montants saisis et récompenses depuis un tableau de bord dédié." },
   { icon: "◎", title: "Connaissance client", description: "Repérez les habitudes utiles à votre fidélisation sans mélanger les données entre établissements." },
-  { icon: "↗", title: "Équipe et points de vente", description: "Préparez des accès adaptés à vos collaborateurs et faites évoluer Valorya avec votre PME." },
+  { icon: "↗", title: "Suivi en caisse", description: "Identifiez le caissier qui valide chaque passage et suivez son activité depuis votre espace commerçant." },
 ] as const;
 
 export const landingStats = [
@@ -58,5 +53,5 @@ export const landingFaq = [
   { q: "Comment mon équipe valide-t-elle les passages ?", a: "Depuis la caisse : on scanne ou on recherche le client, on choisit qui valide, puis un seul bouton enregistre le passage. Vous suivez les résultats de chaque membre de l’équipe." },
   { q: "Que se passe-t-il si un client perd sa carte ?", a: "Il la déclare perdue depuis son espace : le QR est désactivé et ses points sont conservés. Vous lui remettez une nouvelle carte." },
   { q: "Les données de mes clients sont-elles protégées ?", a: "Chaque commerçant ne voit que ses propres clients. Les points ne peuvent être modifiés que par des fonctions sécurisées côté serveur, et le client peut supprimer son compte à tout moment." },
-  { q: "Combien ça coûte ?", a: "Les offres démarrent à 9 € HT par mois, avec un essai de 30 jours prévu. Les tarifs affichés sont des tarifs de lancement modifiables avant commercialisation." },
+  { q: "Combien ça coûte ?", a: "Essentiel coûte 19 € HT/mois et Wallet 29 € HT/mois. Le premier essai dure 15 jours avec carte bancaire, puis l’abonnement se renouvelle automatiquement sauf résiliation. Les formules annuelles coûtent 190 € et 290 € HT, facturés en une fois." },
 ] as const;
