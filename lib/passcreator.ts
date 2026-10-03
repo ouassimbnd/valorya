@@ -84,7 +84,7 @@ async function getDirectUris(identifier: string) {
 }
 
 async function existingPass(userProvidedId: string): Promise<PasscreatorLinks | null> {
-  const response = await api(`/api/pass/${encodeURIComponent(userProvidedId)}?zapierStyle=true`);
+  const response = await api(`/api/pass/${encodeURIComponent(userProvidedId)}`);
   if (response.status === 404) return null;
   if (!response.ok) throw new Error(await messageOf(response));
   const data = await response.json() as PasscreatorPass;
@@ -95,16 +95,6 @@ async function existingPass(userProvidedId: string): Promise<PasscreatorLinks | 
     downloadPage: data.linkToPassPage || `${PASSCREATOR_BASE}/p/${encodeURIComponent(userProvidedId)}`,
     ...uris,
   };
-}
-
-export async function passcreatorHealth() {
-  if (!passcreatorConfigured()) return { configured: false, connected: false, error: "Variables Passcreator absentes." };
-  try {
-    await describeTemplate();
-    return { configured: true, connected: true, error: "" };
-  } catch (error) {
-    return { configured: true, connected: false, error: error instanceof Error ? error.message : "Connexion Passcreator impossible." };
-  }
 }
 
 /**

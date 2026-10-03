@@ -17,7 +17,7 @@ const NAV: { label: string; items: [string, string, string][] }[] = [
 ];
 const ALL = NAV.flatMap(group => group.items);
 const AUTH_PATHS = ["/business/login", "/business/new", "/business/forgot-password", "/business/reset-password"];
-const CLIENT_PUBLIC = ["/join", "/card", "/c", "/customer/login", "/auth/callback"];
+const CLIENT_PUBLIC = ["/join", "/card", "/customer/login", "/auth/callback"];
 
 type Identity = { name: string; emoji: string; color: string };
 

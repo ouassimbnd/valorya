@@ -42,15 +42,8 @@ function Content() {
       const client = supabase();
       const { data: { user } } = await client.auth.getUser();
       if (!user) { location.replace("/customer/login"); return; }
-      let { data: c, error: ce } = await client.from("customers").select("id,display_name").eq("auth_user_id", user.id).maybeSingle();
+      const { data: c, error: ce } = await client.from("customers").select("id,display_name").eq("auth_user_id", user.id).maybeSingle();
       if (ce) throw ce;
-      if (!c) {
-        const claimed = await client.rpc("claim_customer_by_email");
-        if (claimed.error) throw claimed.error;
-        const reread = await client.from("customers").select("id,display_name").eq("auth_user_id", user.id).maybeSingle();
-        if (reread.error) throw reread.error;
-        c = reread.data;
-      }
       setCustomer(c);
       if (!c) { setItems([]); setLoading(false); return; }
       const { data, error } = await client.from("memberships").select(`id,joined_at,card_token,program:programs(id,business:businesses(${COLUMNS}))`).eq("customer_id", c.id).order("joined_at", { ascending: false });
@@ -162,7 +155,7 @@ function Content() {
       {tab === "card" && (
         <div className="stack">
           <section className="card qr-card">
-            <div className="qr-box">{origin ? <QRCodeSVG value={`card:${selected.card_token}`} size={168} marginSize={2} /> : <Skeleton height={168} width={168} />}</div>
+            <div className="qr-box">{origin ? <QRCodeSVG value={`${origin}/business/caisse?card=${selected.card_token}`} size={168} marginSize={2} /> : <Skeleton height={168} width={168} />}</div>
             <div><h2>Mon QR de fidélité</h2><p>Montrez-le en caisse : ce QR contient uniquement un identifiant aléatoire. Le commerçant retrouve votre fiche puis confirme lui-même l’opération.</p></div>
           </section>
           <section className="card"><WalletButton membershipId={selected.id} /></section>

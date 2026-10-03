@@ -1,12 +1,11 @@
 "use client";
-import { useEffect, useState, type FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { configured, supabase, errorMessage } from "@/lib/supabase";
 import { Icon } from "@/components/icons";
 
 export default function CustomerLogin() {
   const [email, setEmail] = useState("");
-  useEffect(() => { const value = new URLSearchParams(location.search).get("email"); if (value) setEmail(value); }, []);
   const [sent, setSent] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

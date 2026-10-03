@@ -215,7 +215,3 @@ textarea.input{resize:vertical;line-height:1.5}.input:focus{border-color:var(--c
  .poster-preview{background:none;padding:0}.poster-sheet{max-width:none;width:150mm;margin:10mm auto;box-shadow:none;border:2px solid #ddd;border-top:16px solid var(--poster);padding:14mm}.poster-qr svg{width:80mm;height:80mm}.poster-sheet h3{font-size:28px}
  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
-
-/* Parcours client frictionless Valorya */
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field small{display:block;margin-top:6px;color:var(--muted);font-size:12px;line-height:1.45}.field span i{font-style:normal;color:var(--muted);font-weight:500}.digital-card{overflow:hidden}.personal-qr{display:grid;justify-items:center;gap:10px;margin-top:24px;padding:22px;border-radius:18px;background:#F7FAFC;border:1px solid #DEE6ED}.personal-qr svg{background:white;border-radius:12px;padding:8px;max-width:100%;height:auto}.personal-qr strong{font-size:16px;color:#102D46}.personal-qr .hint{text-align:center;max-width:430px;margin:0}.join-form .notice .btn{margin-top:12px;margin-right:8px}.join-form .check-line b{font-weight:600;color:var(--muted)}
-@media(max-width:640px){.form-grid{grid-template-columns:1fr}.personal-qr{padding:18px}.personal-qr svg{width:min(210px,80vw);height:auto}}
