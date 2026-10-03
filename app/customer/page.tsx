@@ -1,5 +1,4 @@
 "use client";
-import { syncWallet } from "@/lib/wallet-client";
 import { Suspense, useCallback, useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -25,7 +24,7 @@ function Content() {
   const [origin, setOrigin] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [customer, setCustomer] = useState<{ id: string; display_name: string; first_name: string | null; last_name: string | null } | null>(null);
+  const [customer, setCustomer] = useState<{ id: string; display_name: string } | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [selected, setSelected] = useState<Item | null>(null);
   const [summary, setSummary] = useState<Summary>({ visits: 0, feedback: 0, redeemed: 0, spent: 0, canRate: false });
@@ -43,12 +42,12 @@ function Content() {
       const client = supabase();
       const { data: { user } } = await client.auth.getUser();
       if (!user) { location.replace("/customer/login"); return; }
-      let { data: c, error: ce } = await client.from("customers").select("id,display_name,first_name,last_name").eq("auth_user_id", user.id).maybeSingle();
+      let { data: c, error: ce } = await client.from("customers").select("id,display_name").eq("auth_user_id", user.id).maybeSingle();
       if (ce) throw ce;
       if (!c) {
         const claimed = await client.rpc("claim_customer_by_email");
         if (claimed.error) throw claimed.error;
-        const reread = await client.from("customers").select("id,display_name,first_name,last_name").eq("auth_user_id", user.id).maybeSingle();
+        const reread = await client.from("customers").select("id,display_name").eq("auth_user_id", user.id).maybeSingle();
         if (reread.error) throw reread.error;
         c = reread.data;
       }
@@ -86,7 +85,7 @@ function Content() {
   const rate = async (rating: number) => {
     if (!selected || busy) return;
     setBusy(true);
-    try { const { error } = await supabase().rpc("submit_feedback", { p_membership: selected.id, p_rating: rating }); if (error) throw error; toast("Merci ! 5 points ajoutés pour votre retour privé."); await load(); void syncWallet(selected.id); }
+    try { const { error } = await supabase().rpc("submit_feedback", { p_membership: selected.id, p_rating: rating }); if (error) throw error; toast("Merci ! 5 points ajoutés pour votre retour privé."); await load(); }
     catch (e) { toast(errorMessage(e), "error"); } finally { setBusy(false); }
   };
   const lost = async () => {
@@ -100,7 +99,7 @@ function Content() {
     const value = nameDraft.trim();
     if (!customer || value.length < 2 || busy) { toast("Le prénom doit contenir au moins 2 caractères.", "error"); return; }
     setBusy(true);
-    try { const { error } = await supabase().from("customers").update({ display_name: [value.slice(0, 60), customer.last_name].filter(Boolean).join(" "), first_name: value.slice(0, 60) }).eq("id", customer.id); if (error) throw error; toast("Prénom mis à jour."); setEditing(false); await load(); if (selected) void syncWallet(selected.id); }
+    try { const { error } = await supabase().from("customers").update({ display_name: value.slice(0, 60) }).eq("id", customer.id); if (error) throw error; toast("Prénom mis à jour."); setEditing(false); await load(); }
     catch (e) { toast(errorMessage(e), "error"); } finally { setBusy(false); }
   };
   const deleteData = async () => {
@@ -210,7 +209,7 @@ function Content() {
               <div className="form"><label className="field"><span>Prénom</span><input className="input" value={nameDraft} maxLength={60} onChange={e => setNameDraft(e.target.value)} /></label>
                 <div className="btn-row"><button type="button" className="btn btn-primary" disabled={busy} onClick={() => void saveName()}>Enregistrer</button><button type="button" className="btn btn-ghost" onClick={() => setEditing(false)}>Annuler</button></div></div>
             ) : (
-              <div className="profile-line"><div><strong>{customer?.display_name}</strong><small>Prénom affiché au commerçant</small></div><button type="button" className="btn btn-ghost btn-sm" onClick={() => { setNameDraft(customer?.first_name || customer?.display_name || ""); setEditing(true); }}>Modifier</button></div>
+              <div className="profile-line"><div><strong>{customer?.display_name}</strong><small>Prénom affiché au commerçant</small></div><button type="button" className="btn btn-ghost btn-sm" onClick={() => { setNameDraft(customer?.display_name || ""); setEditing(true); }}>Modifier</button></div>
             )}
           </section>
           <section className="card">
