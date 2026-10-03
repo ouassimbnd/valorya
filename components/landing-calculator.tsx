@@ -12,7 +12,7 @@ function RangeField({ label, value, min, max, step, unit = "", onChange }: {
     <span className="mb-3 flex items-center justify-between gap-4 text-sm font-semibold text-[#102D46]">
       <span>{label}</span><strong className="whitespace-nowrap text-base">{unit === landingConfig.currencySymbol ? euro.format(value) : `${value}${unit}`}</strong>
     </span>
-    <input className="landing-range w-full cursor-pointer accent-[#109B81]" type="range" min={min} max={max} step={step} value={value}
+    <input className="landing-range w-full cursor-pointer accent-[#0FA3A0]" type="range" min={min} max={max} step={step} value={value}
       onChange={event => onChange(Number(event.target.value))} aria-label={label} />
     <span className="mt-1 flex justify-between text-xs text-black/45"><span>{unit === landingConfig.currencySymbol ? euro.format(min) : `${min}${unit}`}</span><span>{unit === landingConfig.currencySymbol ? euro.format(max) : `${max}${unit}`}</span></span>
   </label>;
@@ -31,7 +31,7 @@ export function LandingCalculator() {
 
   return <div className="grid overflow-hidden rounded-[1.75rem] border-2 border-[#102D46] bg-white shadow-[12px_12px_0_#102D46] lg:grid-cols-[1.05fr_.95fr]">
     <div className="p-6 sm:p-9 lg:p-11">
-      <div className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-[#109B81]">Vos hypothèses</div>
+      <div className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-[#1D4ED8]">Vos hypothèses</div>
       <h3 className="font-display text-3xl uppercase leading-none sm:text-4xl">Ajustez les curseurs</h3>
       <p className="mt-3 text-sm leading-relaxed text-black/60">Utilisez vos propres chiffres. Le scénario ne prédit pas vos résultats.</p>
       <div className="mt-5">
@@ -45,7 +45,7 @@ export function LandingCalculator() {
       <div>
         <span className="rounded-full border border-white/30 px-3 py-1 text-xs font-semibold uppercase tracking-widest">Simulation</span>
         <p className="mt-12 text-sm text-white/65">Scénario de chiffre d’affaires additionnel</p>
-        <strong className="mt-2 block font-display text-[clamp(3.1rem,6vw,5.5rem)] leading-none text-[#8EE0CB]">+{euro.format(additional)}</strong>
+        <strong className="mt-2 block font-display text-[clamp(3.1rem,6vw,5.5rem)] leading-none text-[#5EEAD4]">+{euro.format(additional)}</strong>
         <span className="text-sm text-white/65">par mois, selon votre hypothèse</span>
       </div>
       <div className="mt-12 border-t border-white/20 pt-6">

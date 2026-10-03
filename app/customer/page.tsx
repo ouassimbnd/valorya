@@ -1,4 +1,5 @@
 "use client";
+import { syncWallet } from "@/lib/wallet-client";
 import { Suspense, useCallback, useEffect, useState, type CSSProperties } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -24,7 +25,7 @@ function Content() {
   const [origin, setOrigin] = useState("");
   const [busy, setBusy] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [customer, setCustomer] = useState<{ id: string; display_name: string } | null>(null);
+  const [customer, setCustomer] = useState<{ id: string; display_name: string; first_name: string | null; last_name: string | null } | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [selected, setSelected] = useState<Item | null>(null);
   const [summary, setSummary] = useState<Summary>({ visits: 0, feedback: 0, redeemed: 0, spent: 0, canRate: false });
@@ -42,8 +43,15 @@ function Content() {
       const client = supabase();
       const { data: { user } } = await client.auth.getUser();
       if (!user) { location.replace("/customer/login"); return; }
-      const { data: c, error: ce } = await client.from("customers").select("id,display_name").eq("auth_user_id", user.id).maybeSingle();
+      let { data: c, error: ce } = await client.from("customers").select("id,display_name,first_name,last_name").eq("auth_user_id", user.id).maybeSingle();
       if (ce) throw ce;
+      if (!c) {
+        const claimed = await client.rpc("claim_customer_by_email");
+        if (claimed.error) throw claimed.error;
+        const reread = await client.from("customers").select("id,display_name,first_name,last_name").eq("auth_user_id", user.id).maybeSingle();
+        if (reread.error) throw reread.error;
+        c = reread.data;
+      }
       setCustomer(c);
       if (!c) { setItems([]); setLoading(false); return; }
       const { data, error } = await client.from("memberships").select(`id,joined_at,card_token,program:programs(id,business:businesses(${COLUMNS}))`).eq("customer_id", c.id).order("joined_at", { ascending: false });
@@ -78,7 +86,7 @@ function Content() {
   const rate = async (rating: number) => {
     if (!selected || busy) return;
     setBusy(true);
-    try { const { error } = await supabase().rpc("submit_feedback", { p_membership: selected.id, p_rating: rating }); if (error) throw error; toast("Merci ! 5 points ajoutés pour votre retour privé."); await load(); }
+    try { const { error } = await supabase().rpc("submit_feedback", { p_membership: selected.id, p_rating: rating }); if (error) throw error; toast("Merci ! 5 points ajoutés pour votre retour privé."); await load(); void syncWallet(selected.id); }
     catch (e) { toast(errorMessage(e), "error"); } finally { setBusy(false); }
   };
   const lost = async () => {
@@ -92,7 +100,7 @@ function Content() {
     const value = nameDraft.trim();
     if (!customer || value.length < 2 || busy) { toast("Le prénom doit contenir au moins 2 caractères.", "error"); return; }
     setBusy(true);
-    try { const { error } = await supabase().from("customers").update({ display_name: value.slice(0, 60) }).eq("id", customer.id); if (error) throw error; toast("Prénom mis à jour."); setEditing(false); await load(); }
+    try { const { error } = await supabase().from("customers").update({ display_name: [value.slice(0, 60), customer.last_name].filter(Boolean).join(" "), first_name: value.slice(0, 60) }).eq("id", customer.id); if (error) throw error; toast("Prénom mis à jour."); setEditing(false); await load(); if (selected) void syncWallet(selected.id); }
     catch (e) { toast(errorMessage(e), "error"); } finally { setBusy(false); }
   };
   const deleteData = async () => {
@@ -119,7 +127,7 @@ function Content() {
 
   const b = selected.program.business;
   const type = resolveType(b.category);
-  const accent = safeColor(b.accent_color, "#109B81");
+  const accent = safeColor(b.accent_color, "#0FA3A0");
   const points = computePoints(summary.visits, summary.feedback, summary.spent);
   const goal = nextReward(rewards, points);
   const ready = rewards.filter(r => points >= r.points_cost);
@@ -155,7 +163,7 @@ function Content() {
       {tab === "card" && (
         <div className="stack">
           <section className="card qr-card">
-            <div className="qr-box">{origin ? <QRCodeSVG value={`${origin}/business/caisse?card=${selected.card_token}`} size={168} marginSize={2} /> : <Skeleton height={168} width={168} />}</div>
+            <div className="qr-box">{origin ? <QRCodeSVG value={`card:${selected.card_token}`} size={168} marginSize={2} /> : <Skeleton height={168} width={168} />}</div>
             <div><h2>Mon QR de fidélité</h2><p>Montrez-le en caisse : ce QR contient uniquement un identifiant aléatoire. Le commerçant retrouve votre fiche puis confirme lui-même l’opération.</p></div>
           </section>
           <section className="card"><WalletButton membershipId={selected.id} /></section>
@@ -202,7 +210,7 @@ function Content() {
               <div className="form"><label className="field"><span>Prénom</span><input className="input" value={nameDraft} maxLength={60} onChange={e => setNameDraft(e.target.value)} /></label>
                 <div className="btn-row"><button type="button" className="btn btn-primary" disabled={busy} onClick={() => void saveName()}>Enregistrer</button><button type="button" className="btn btn-ghost" onClick={() => setEditing(false)}>Annuler</button></div></div>
             ) : (
-              <div className="profile-line"><div><strong>{customer?.display_name}</strong><small>Prénom affiché au commerçant</small></div><button type="button" className="btn btn-ghost btn-sm" onClick={() => { setNameDraft(customer?.display_name || ""); setEditing(true); }}>Modifier</button></div>
+              <div className="profile-line"><div><strong>{customer?.display_name}</strong><small>Prénom affiché au commerçant</small></div><button type="button" className="btn btn-ghost btn-sm" onClick={() => { setNameDraft(customer?.first_name || customer?.display_name || ""); setEditing(true); }}>Modifier</button></div>
             )}
           </section>
           <section className="card">

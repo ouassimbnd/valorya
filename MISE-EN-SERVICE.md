@@ -59,6 +59,6 @@ Tant que ces variables sont absentes, le bouton Google Wallet est désactivé av
 - Le lecteur de QR intégré à la caisse utilise l'API `BarcodeDetector` (Chrome/Android, Edge). Sur iPhone/Safari, scanner avec l'appareil photo du téléphone : le QR ouvre directement la caisse.
 - Les caissiers sont des profils de suivi, pas des comptes de connexion : la caisse s'ouvre avec le compte propriétaire. Des comptes avec code PIN nécessitent une évolution de la base (v14).
 - Un logo image (PNG) nécessite Supabase Storage : le logo reste un emoji pour l'instant.
-- Cartes Wallet non synchronisées : elles identifient le client, le solde se consulte dans son espace. Pas de notifications push.
+- Cartes Passcreator synchronisées après installation de DEMARRER-WALLET-PERSONNALISE.md. Le solde Supabase reste la référence. Les anciennes routes Wallet directes restent distinctes de cette intégration ; pas de campagnes push promotionnelles.
 - Pas de facturation d'abonnement, ni de multi-établissements réel (inchangé). Les mentions légales et engagements commerciaux sont à compléter.
 - Le nombre de points par visite (10) et par avis (5) est fixé par la base : le rendre configurable demande une migration.

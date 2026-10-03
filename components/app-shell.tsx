@@ -17,7 +17,7 @@ const NAV: { label: string; items: [string, string, string][] }[] = [
 ];
 const ALL = NAV.flatMap(group => group.items);
 const AUTH_PATHS = ["/business/login", "/business/new", "/business/forgot-password", "/business/reset-password"];
-const CLIENT_PUBLIC = ["/join", "/card", "/customer/login", "/auth/callback"];
+const CLIENT_PUBLIC = ["/join", "/card", "/c", "/customer/login", "/auth/callback"];
 
 type Identity = { name: string; emoji: string; color: string };
 
@@ -44,7 +44,7 @@ function MerchantShell({ path, children }: { path: string; children: ReactNode }
         const { data } = await client.from("businesses").select("name,category,logo_emoji,accent_color").eq("owner_id", user.id).maybeSingle();
         if (data && !cancelled) {
           const type = resolveType(data.category);
-          setIdentity({ name: data.name, emoji: data.logo_emoji || type.emoji, color: safeColor(data.accent_color, "#109B81") });
+          setIdentity({ name: data.name, emoji: data.logo_emoji || type.emoji, color: safeColor(data.accent_color, "#0FA3A0") });
         }
       } catch { /* l’identité du commerce est décorative : on ignore l’échec */ }
     };
@@ -67,7 +67,7 @@ function MerchantShell({ path, children }: { path: string; children: ReactNode }
       <aside className={`app-sidebar ${open ? "is-open" : ""}`} aria-label="Navigation de l’espace commerçant">
         <Link className="brand" href="/business"><BrandLogo size={30} /><span>Valorya</span></Link>
         <div className="sidebar-business">
-          <span className="sidebar-avatar" style={{ background: identity?.color || "#109B81" }} aria-hidden="true">{identity?.emoji || "•"}</span>
+          <span className="sidebar-avatar" style={{ background: identity?.color || "#0FA3A0" }} aria-hidden="true">{identity?.emoji || "•"}</span>
           <div><strong>{identity?.name || "Mon commerce"}</strong><small>Espace commerçant</small></div>
         </div>
         <nav>
